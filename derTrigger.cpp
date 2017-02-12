@@ -1,17 +1,34 @@
-// Do not remove the include below
+/*
+ * derTrigger.cpp
+ *
+ *  Created on: 09.02.2017
+ *      Author: cybaer
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "derTrigger.h"
+#include "HardwareConfig.h"
 
-
-// the setup function runs once when you press reset or power the board
-void setup() {
-  // initialize digital pin 13 as an output.
+void setup()
+{
+  initHW();
   pinMode(13, OUTPUT);
 }
 
-// the loop function runs over and over again forever
 void loop() {
-  digitalWrite(13, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(200);              // wait for a second
-  digitalWrite(13, LOW);    // turn the LED off by making the voltage LOW
-  delay(200);              // wait for a second
+  digitalWrite(13, true);
+  delay(200);
+  digitalWrite(13, false);
+  delay(200);
 }
