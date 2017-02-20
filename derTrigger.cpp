@@ -20,15 +20,54 @@
 #include "derTrigger.h"
 #include "HardwareConfig.h"
 
+volatile bool poll = false;
+
+ISR(TIMER2_OVF_vect, ISR_NOBLOCK)
+{
+  //ca 4kHz
+
+  static int8_t subClock = 0;
+  subClock = (subClock + 1) & 3;
+
+  if (subClock == 0)
+  { // 1kHz
+    poll = true;
+  }
+}
+
 void setup()
 {
   initHW();
+
   pinMode(13, OUTPUT);
+
+
+  //     16MHz / (8 * 510) = 3906,25 Hz
+  // prescaler(2)_|
+  Timer<2>::set_prescaler(2);//2
+  Timer<2>::set_mode(TIMER_PWM_PHASE_CORRECT);
+  Timer<2>::Start();
 }
 
 void loop() {
+
   digitalWrite(13, true);
+static uint8_t x=1;
+
+        Extender.writeGPIOA(x);
+        Extender.writeGPIOB(x);
+        if(x == 0x80)
+          x = 1;
+        else
+          x = x*2;
   delay(200);
   digitalWrite(13, false);
   delay(200);
+
+  if(poll)
+  {
+    poll = false;
+
+
+  }
 }

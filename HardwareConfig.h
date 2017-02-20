@@ -26,9 +26,11 @@
 #include "avrlib/base.h"
 #include "avrlib/gpio.h"
 #include "avrlib/devices/switch.h"
-#include "avrlib/i2c/i2c.h"
+//#include "avrlib/i2c/i2c.h"
+#include "MCP23017.h"
 
 using namespace avrlib;
+
 
 typedef Gpio<PortD, 2> ClockIn;
 typedef Gpio<PortD, 3> StartIn;
@@ -43,7 +45,11 @@ typedef Gpio<PortD, 7> Output_A;
 typedef Gpio<PortB, 0> Output_B;
 typedef Gpio<PortB, 1> ClockOut;
 
-static I2cMaster<8, 4, 400000> I2C_bus;
+//typedef I2cMaster<8, 4, 100000> I2C_bus;
+
+
+
+ MCP23017 Extender;
 
 void initInputs(void)
 {
@@ -55,6 +61,8 @@ void initInputs(void)
   ResetIn::High();
   StartButton::Init();
   ResetButton::Init();
+
+
 }
 void initOutputs(void)
 {
@@ -76,6 +84,13 @@ void initHW(void)
   initInputs();
   initOutputs();
   initAnalogIn();
+  Extender.init(0);
+
+
+
 }
+
+
+
 
 #endif /* HARDWARECONFIG_H_ */
