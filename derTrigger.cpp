@@ -20,11 +20,16 @@
 #include "derTrigger.h"
 #include "HardwareConfig.h"
 
+#include "Sequencer.h"
+
+MCP23017 Extender;
+
 volatile bool poll = false;
 
 ISR(TIMER2_OVF_vect, ISR_NOBLOCK)
 {
   //ca 4kHz
+  sequencer.onClock();
 
   static int8_t subClock = 0;
   subClock = (subClock + 1) & 3;
@@ -67,7 +72,7 @@ static uint8_t x=1;
   if(poll)
   {
     poll = false;
-
+    sequencer.poll();
 
   }
 }

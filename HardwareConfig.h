@@ -32,9 +32,12 @@
 using namespace avrlib;
 
 
-typedef Gpio<PortD, 2> ClockIn;
-typedef Gpio<PortD, 3> StartIn;
-typedef Gpio<PortD, 4> ResetIn;
+typedef Gpio<PortD, 2> ClockIn;  // 2
+typedef Gpio<PortD, 3> StartIn;  // 3
+typedef Gpio<PortD, 4> ResetIn;  // 4
+typedef Gpio<PortB, 2> Input_A;  // 10
+typedef Gpio<PortB, 3> Input_B;  // 11
+
 
 typedef Gpio<PortD, 5> Start_;
 typedef Gpio<PortD, 6> Reset_;
@@ -49,9 +52,9 @@ typedef Gpio<PortB, 1> ClockOut;
 
 
 
- MCP23017 Extender;
+ extern MCP23017 Extender;
 
-void initInputs(void)
+inline void initInputs(void)
 {
   ClockIn::set_mode(DIGITAL_INPUT);
   ClockIn::High();
@@ -59,12 +62,17 @@ void initInputs(void)
   StartIn::High();
   ResetIn::set_mode(DIGITAL_INPUT);
   ResetIn::High();
+  Input_A::set_mode(DIGITAL_INPUT);
+  Input_A::Low();
+  Input_B::set_mode(DIGITAL_INPUT);
+  Input_B::Low();
+
   StartButton::Init();
   ResetButton::Init();
 
 
 }
-void initOutputs(void)
+inline void initOutputs(void)
 {
   Output_A::set_mode(DIGITAL_OUTPUT);
   Output_A::set_value(true);
@@ -74,12 +82,12 @@ void initOutputs(void)
   ClockOut::set_value(true);
 }
 
-void initAnalogIn(void)
+inline void initAnalogIn(void)
 {
-  ;
+
 }
 
-void initHW(void)
+inline void initHW(void)
 {
   initInputs();
   initOutputs();
