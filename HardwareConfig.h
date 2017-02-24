@@ -38,6 +38,8 @@ typedef Gpio<PortD, 4> ResetIn;  // 4
 typedef Gpio<PortB, 2> Input_A;  // 10
 typedef Gpio<PortB, 3> Input_B;  // 11
 
+typedef Gpio<PortB, 5> debug;  // 13
+
 
 typedef Gpio<PortD, 5> Start_;
 typedef Gpio<PortD, 6> Reset_;
@@ -80,6 +82,9 @@ inline void initOutputs(void)
   Output_B::set_value(true);
   ClockOut::set_mode(DIGITAL_OUTPUT);
   ClockOut::set_value(true);
+
+  debug::set_mode(DIGITAL_OUTPUT);
+  debug::Low();
 }
 
 inline void initAnalogIn(void)
@@ -93,7 +98,8 @@ inline void initHW(void)
   initOutputs();
   initAnalogIn();
   Extender.init(0);
-
+  Extender.writeGPIOA(0);
+  Extender.writeGPIOB(0);
 
 
 }

@@ -36,9 +36,14 @@ public:
 
 private:
   void checkPulseOut(void);
+  void nextStep(void);
+  void calcOut_A(void);
+  void calcOut_B(void);
 
   uint8_t m_Tick;
   bool m_Run;
+  bool m_ClockValue;
+  uint8_t m_Step;
 };
 
 extern Sequencer sequencer;

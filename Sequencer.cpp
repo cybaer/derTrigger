@@ -26,12 +26,27 @@ Sequencer sequencer;
 Sequencer::Sequencer(void)
 : m_Tick(0)
 , m_Run(false)
+, m_ClockValue(true)
+, m_Step(0)
 {}
 
 void Sequencer::onStep(void)
 {
-
+  nextStep();
+  //calcOut_A();
+  //calcOut_B();
 }
+void Sequencer::nextStep(void)
+{
+  static uint8_t a = 0;
+  if(++m_Step == 8) m_Step = 0;
+  uint8_t x = 0x1 << m_Step;
+  //Extender.writeGPIOB(m_Step);
+    Extender.writeGPIOA(x);
+}
+
+
+
 void Sequencer::poll(void)
 {
   StartButton::Read();
@@ -40,6 +55,17 @@ void Sequencer::poll(void)
 
   if(StartButton::raised()) onStartStop();
   if(ResetButton::raised()) onReset();
+
+
+  if(ClockIn::is_low() && m_ClockValue)
+  {
+    onStep();
+    debug::Toggle();
+  }
+  m_ClockValue = ClockIn::value();
+
+
+
 }
 
 void Sequencer::onReset(void)

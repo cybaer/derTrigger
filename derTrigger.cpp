@@ -44,8 +44,6 @@ void setup()
 {
   initHW();
 
-  pinMode(13, OUTPUT);
-
 
   //     16MHz / (8 * 510) = 3906,25 Hz
   // prescaler(2)_|
@@ -55,19 +53,8 @@ void setup()
 }
 
 void loop() {
-
-  digitalWrite(13, true);
-static uint8_t x=1;
-
-        Extender.writeGPIOA(x);
-        Extender.writeGPIOB(x);
-        if(x == 0x80)
-          x = 1;
-        else
-          x = x*2;
-  delay(200);
-  digitalWrite(13, false);
-  delay(200);
+  //sequencer.onStep();
+  //delay(500);
 
   if(poll)
   {
