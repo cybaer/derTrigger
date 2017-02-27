@@ -18,7 +18,7 @@
  */
 
 #include <stdlib.h> // prevent compiler error
-
+#include "Arduino.h"
 #include "Sequencer.h"
 
 Sequencer sequencer;
@@ -38,7 +38,7 @@ Sequencer::Sequencer(void)
 void Sequencer::onStep(void)
 {
   createNextStep();
-
+  //delay(1);
   writeOutStep();
 }
 void Sequencer::createNextStep(void)
@@ -51,12 +51,10 @@ void Sequencer::createNextStep(void)
   Extender.writeGPIOA(x >> 8);
 }
 
-
-
 void Sequencer::writeOutStep(void)
 {
   nextStep_A(Input_A::value());
-  //nextStep_B(Input_B::value());
+  nextStep_B(Input_B::value());
 }
 
 void Sequencer::nextStep_A(uint8_t in)
@@ -68,7 +66,14 @@ void Sequencer::nextStep_A(uint8_t in)
   }
 
 }
-
+void Sequencer::nextStep_B(uint8_t in)
+{
+  if(in)
+  {
+    debug::Toggle();
+    m_Pulse_B.set(m_Tick);
+  }
+}
 
 void Sequencer::poll(void)
 {
@@ -80,11 +85,7 @@ void Sequencer::poll(void)
   if(ResetButton::raised()) onReset();
 
   m_Pulse_A.checkReset(m_Tick);
-
-
-
-
-
+  m_Pulse_B.checkReset(m_Tick);
 
 
   if(ClockIn::is_low() && m_ClockValue)
@@ -93,8 +94,6 @@ void Sequencer::poll(void)
 
   }
   m_ClockValue = ClockIn::value();
-
-
 
 }
 

@@ -41,14 +41,14 @@ typedef Gpio<PortB, 3> Input_B;  // 11
 typedef Gpio<PortB, 5> debug;  // 13
 
 
-typedef Gpio<PortD, 5> Start_;
-typedef Gpio<PortD, 6> Reset_;
+typedef Gpio<PortB, 0> Start_;  // 8
+typedef Gpio<PortB, 1> Reset_;  // 9
 typedef DebouncedSwitch< Start_> StartButton;
 typedef DebouncedSwitch< Reset_> ResetButton;
 
-typedef Gpio<PortD, 7> Output_A;
-typedef Gpio<PortB, 0> Output_B;
-typedef Gpio<PortB, 1> ClockOut;
+typedef Gpio<PortD, 7> Output_A;  // 7
+typedef Gpio<PortD, 6> Output_B;  // 6
+typedef Gpio<PortD, 5> ClockOut;  // 5
 
 //typedef I2cMaster<8, 4, 100000> I2C_bus;
 

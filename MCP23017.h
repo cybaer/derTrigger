@@ -20,7 +20,7 @@
 #ifndef MCP23017_H_
 #define MCP23017_H_
 
-
+#define TWI_FREQ 400000L
 #include "Wire.h"
 
 #define MCP23017_ADDRESS 0x20

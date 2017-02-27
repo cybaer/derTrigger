@@ -27,7 +27,6 @@ class Pulse
 {
 public:
 
-
   void setLength(uint8_t len) { m_Length = len; }
   void set(uint8_t tick)
   {
