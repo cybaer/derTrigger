@@ -28,23 +28,46 @@ Sequencer::Sequencer(void)
 , m_Run(false)
 , m_ClockValue(true)
 , m_Step(0)
-{}
+, m_Pulse_A()
+, m_Pulse_B()
+{
+  m_Pulse_A.setLength(8);
+  m_Pulse_B.setLength(8);
+}
 
 void Sequencer::onStep(void)
 {
-  nextStep();
-  //calcOut_A();
-  //calcOut_B();
+  createNextStep();
+
+  writeOutStep();
 }
-void Sequencer::nextStep(void)
+void Sequencer::createNextStep(void)
 {
-  static uint8_t a = 0;
-  if(++m_Step == 8) m_Step = 0;
-  uint8_t x = 0x1 << m_Step;
-  //Extender.writeGPIOB(m_Step);
-    Extender.writeGPIOA(x);
+  static const uint8_t MaxSteps = 16;
+  if(++m_Step == MaxSteps) m_Step = 0;
+
+  uint16_t x = 0x1 << m_Step;
+  Extender.writeGPIOB(x & 0xFF);
+  Extender.writeGPIOA(x >> 8);
 }
 
+
+
+void Sequencer::writeOutStep(void)
+{
+  nextStep_A(Input_A::value());
+  //nextStep_B(Input_B::value());
+}
+
+void Sequencer::nextStep_A(uint8_t in)
+{
+  if(in)
+  {
+    debug::Toggle();
+    m_Pulse_A.set(m_Tick);
+  }
+
+}
 
 
 void Sequencer::poll(void)
@@ -56,11 +79,18 @@ void Sequencer::poll(void)
   if(StartButton::raised()) onStartStop();
   if(ResetButton::raised()) onReset();
 
+  m_Pulse_A.checkReset(m_Tick);
+
+
+
+
+
+
 
   if(ClockIn::is_low() && m_ClockValue)
   {
     onStep();
-    debug::Toggle();
+
   }
   m_ClockValue = ClockIn::value();
 

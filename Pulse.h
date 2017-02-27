@@ -1,7 +1,7 @@
 /*
- * Sequencer.h
+ * Pulse.h
  *
- *  Created on: 22.02.2017
+ *  Created on: 26.02.2017
  *      Author: cybaer
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,42 +17,40 @@
  *
  */
 
-#ifndef SEQUENCER_H_
-#define SEQUENCER_H_
+#ifndef PULSE_H_
+#define PULSE_H_
 
 #include "HardwareConfig.h"
-#include "Pulse.h"
 
-using namespace avrlib;
-
-class Sequencer
+template<typename Output>
+class Pulse
 {
 public:
-  Sequencer(void);
-  void onClock(void) { m_Tick++; } // called only in ISR context
-  void onStep(void);
-  void poll(void);
 
-  void onStartStop(void) { m_Run = !m_Run; };
-  void onReset(void);
 
+  void setLength(uint8_t len) { m_Length = len; }
+  void set(uint8_t tick)
+  {
+    m_EndTick = tick + m_Length;
+    Output::High();
+  }
+  void checkReset(uint8_t tick)
+  {
+    if(m_EndTick-tick <= 0)
+    {
+      Output::Low();
+    }
+  }
+  bool isActive(void) const { return Output::is_high(); }
 private:
-  void checkPulseOut(void);
-  void createNextStep(void);
-
-  void writeOutStep(void);
-
-  void nextStep_A(uint8_t in);
-  void nextStep_B(uint8_t in);
-
-  uint8_t m_Tick;
-  bool m_Run;
-  bool m_ClockValue;
-  uint8_t m_Step;
-  Pulse<Output_A> m_Pulse_A;
-  Pulse<Output_B> m_Pulse_B;
+  static uint8_t m_Length;
+  static uint8_t m_EndTick;
 };
 
-extern Sequencer sequencer;
+template<typename Output>
+uint8_t Pulse<Output>::m_Length;
+template<typename Output>
+uint8_t Pulse<Output>::m_EndTick;
 
-#endif /* SEQUENCER_H_ */
+
+#endif /* PULSE_H_ */
