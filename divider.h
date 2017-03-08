@@ -1,7 +1,7 @@
 /*
- * derTrigger.cpp
+ * divider.h
  *
- *  Created on: 09.02.2017
+ *  Created on: 04.03.2017
  *      Author: cybaer
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,49 +17,30 @@
  *
  */
 
-#include "derTrigger.h"
-#include "HardwareConfig.h"
+#ifndef DIVIDER_H_
+#define DIVIDER_H_
 
-#include "Sequencer.h"
-
-MCP23017 Extender;
-
-volatile bool poll = false;
-
-ISR(TIMER2_OVF_vect, ISR_NOBLOCK)
+class Divider
 {
-  //ca 4kHz
-  sequencer.onClock();
-
-  static int8_t subClock = 0;
-  subClock = (subClock + 1) & 3;
-
-  if (subClock == 0)
-  { // 1kHz
-    poll = true;
-  }
-}
-
-void setup()
-{
-  initHW();
-
-
-  //     16MHz / (8 * 510) = 3906,25 Hz
-  // prescaler(2)_|
-  Timer<2>::set_prescaler(2);//2
-  Timer<2>::set_mode(TIMER_PWM_PHASE_CORRECT);
-  Timer<2>::Start();
-}
-
-void loop() {
-  //sequencer.onStep();
-  //delay(500);
-
-  if(poll)
+public:
+  Divider(void)
+  : m_Tick(0)
+  , m_Divider(2)
+  , m_Factor(1)
+  {}
+  bool operator()(uint8_t in)
   {
-    poll = false;
-    sequencer.poll();
+
   }
-  sequencer.update();
-}
+  void onTick(void) { m_Tick++; }
+  void setDivider(uint8_t divider) { m_Divider = divider; }
+  void setFactor(uint8_t factor) { m_Factor = factor; }
+private:
+  uint8_t m_Tick;
+  uint8_t m_Divider;
+  uint8_t m_Factor;
+};
+
+
+
+#endif /* DIVIDER_H_ */

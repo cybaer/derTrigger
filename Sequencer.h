@@ -22,6 +22,8 @@
 
 #include "HardwareConfig.h"
 #include "Pulse.h"
+#include "clock.h"
+#include "divider.h"
 
 using namespace avrlib;
 
@@ -29,9 +31,10 @@ class Sequencer
 {
 public:
   Sequencer(void);
-  void onClock(void) { m_Tick++; } // called only in ISR context
+  void onClock(void) { m_Tick++; divider.onTick(); } // called only in ISR context
   void onStep(void);
   void poll(void);
+  void update(void);
 
   void onStartStop(void) { m_Run = !m_Run; };
   void onReset(void);
@@ -45,6 +48,8 @@ private:
   void nextStep_A(uint8_t in);
   void nextStep_B(uint8_t in);
 
+  Divider divider;
+  Clock<ClockOut> clock;
   uint8_t m_Tick;
   bool m_Run;
   bool m_ClockValue;

@@ -1,7 +1,7 @@
 /*
- * derTrigger.cpp
+ * clock.h
  *
- *  Created on: 09.02.2017
+ *  Created on: 03.03.2017
  *      Author: cybaer
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,49 +17,33 @@
  *
  */
 
-#include "derTrigger.h"
-#include "HardwareConfig.h"
+#ifndef CLOCK_H_
+#define CLOCK_H_
 
-#include "Sequencer.h"
-
-MCP23017 Extender;
-
-volatile bool poll = false;
-
-ISR(TIMER2_OVF_vect, ISR_NOBLOCK)
+template <typename ClockOut>
+class Clock
 {
-  //ca 4kHz
-  sequencer.onClock();
+public:
 
-  static int8_t subClock = 0;
-  subClock = (subClock + 1) & 3;
-
-  if (subClock == 0)
-  { // 1kHz
-    poll = true;
-  }
-}
-
-void setup()
-{
-  initHW();
-
-
-  //     16MHz / (8 * 510) = 3906,25 Hz
-  // prescaler(2)_|
-  Timer<2>::set_prescaler(2);//2
-  Timer<2>::set_mode(TIMER_PWM_PHASE_CORRECT);
-  Timer<2>::Start();
-}
-
-void loop() {
-  //sequencer.onStep();
-  //delay(500);
-
-  if(poll)
+  Clock(void)
+  : m_OldValue(0)
+  {}
+  // always wanted to use a functor :-)
+  bool operator()(uint8_t in)
   {
-    poll = false;
-    sequencer.poll();
+    ClockOut::set_value(in);
+    bool ret = (in == 0 && m_OldValue != 0);
+    m_OldValue = in;
+    return ret;
   }
-  sequencer.update();
-}
+
+
+
+private:
+
+  uint8_t m_OldValue;
+
+};
+
+
+#endif /* CLOCK_H_ */

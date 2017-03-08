@@ -24,7 +24,9 @@
 Sequencer sequencer;
 
 Sequencer::Sequencer(void)
-: m_Tick(0)
+: divider()
+, clock()
+, m_Tick(0)
 , m_Run(false)
 , m_ClockValue(true)
 , m_Step(0)
@@ -84,17 +86,24 @@ void Sequencer::poll(void)
   if(StartButton::raised()) onStartStop();
   if(ResetButton::raised()) onReset();
 
-  m_Pulse_A.checkReset(m_Tick);
-  m_Pulse_B.checkReset(m_Tick);
 
 
-  if(ClockIn::is_low() && m_ClockValue)
+//ClockOut::set_value(ClockIn::value());
+
+  //if(ClockIn::is_low() && m_ClockValue)
+if(clock(ClockIn::value()))
   {
     onStep();
 
   }
   m_ClockValue = ClockIn::value();
 
+}
+
+void Sequencer::update()
+{
+  m_Pulse_A.checkReset(m_Tick);
+  m_Pulse_B.checkReset(m_Tick);
 }
 
 void Sequencer::onReset(void)
