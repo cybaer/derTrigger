@@ -20,8 +20,12 @@
 #include <stdlib.h> // prevent compiler error
 #include "Arduino.h"
 #include "Sequencer.h"
+#include "analogSwitch.h"
 
 Sequencer sequencer;
+Adc adc;
+
+
 
 Sequencer::Sequencer(void)
 : divider()
@@ -63,7 +67,6 @@ void Sequencer::nextStep_A(uint8_t in)
 {
   if(in)
   {
-    debug::Toggle();
     m_Pulse_A.set(m_Tick);
   }
 
@@ -72,13 +75,14 @@ void Sequencer::nextStep_B(uint8_t in)
 {
   if(in)
   {
-    debug::Toggle();
     m_Pulse_B.set(m_Tick);
   }
 }
 
 void Sequencer::poll(void)
 {
+  debug::High();
+
   StartButton::Read();
   ResetButton::Read();
   checkPulseOut();
@@ -86,18 +90,24 @@ void Sequencer::poll(void)
   if(StartButton::raised()) onStartStop();
   if(ResetButton::raised()) onReset();
 
-
-
-//ClockOut::set_value(ClockIn::value());
-
-  //if(ClockIn::is_low() && m_ClockValue)
-if(clock(ClockIn::value()))
-  {
-    onStep();
-
-  }
   m_ClockValue = ClockIn::value();
 
+  if(clock(divider(m_ClockValue)))
+  {
+    onStep();
+  }
+
+  uint16_t val;
+  val = S3::getValue();
+  val = S4::getValue();
+  val = S5::getValue();
+
+  uint8_t divisor = S1::getValue() + 1;
+  divider.setDivisor(divisor);
+
+  uint8_t mode = S1::getValue();
+
+  debug::Low();
 }
 
 void Sequencer::update()

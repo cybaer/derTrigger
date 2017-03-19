@@ -26,8 +26,10 @@
 #include "avrlib/base.h"
 #include "avrlib/gpio.h"
 #include "avrlib/devices/switch.h"
+#include "avrlib/adc.h"
 //#include "avrlib/i2c/i2c.h"
 #include "MCP23017.h"
+#include "analogSwitch.h"
 
 using namespace avrlib;
 
@@ -52,9 +54,14 @@ typedef Gpio<PortD, 5> ClockOut;  // 5
 
 //typedef I2cMaster<8, 4, 100000> I2C_bus;
 
-
+typedef AnalogSwitch<Adc, 2, 8> S1;
+typedef AnalogSwitch<Adc, 3, 8> S2;
+typedef AnalogSwitch<Adc, 1, 3> S3;
+typedef AnalogSwitch<Adc, 7, 3> S4;
+typedef AnalogSwitch<Adc, 0, 3> S5;
 
  extern MCP23017 Extender;
+ extern Adc adc;
 
 inline void initInputs(void)
 {
@@ -71,8 +78,6 @@ inline void initInputs(void)
 
   StartButton::Init();
   ResetButton::Init();
-
-
 }
 inline void initOutputs(void)
 {
@@ -89,7 +94,7 @@ inline void initOutputs(void)
 
 inline void initAnalogIn(void)
 {
-
+  adc.Init();
 }
 
 inline void initHW(void)
@@ -100,8 +105,6 @@ inline void initHW(void)
   Extender.init(0);
   Extender.writeGPIOA(0);
   Extender.writeGPIOB(0);
-
-
 }
 
 

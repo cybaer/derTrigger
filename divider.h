@@ -25,20 +25,37 @@ class Divider
 public:
   Divider(void)
   : m_Tick(0)
-  , m_Divider(2)
+  , m_Divisor(1)
   , m_Factor(1)
+  , m_OldValue(false)
+  , m_Out(false)
+  , m_Count(0)
   {}
-  bool operator()(uint8_t in)
-  {
 
+  bool operator()(bool in)
+  {
+    if(in != m_OldValue)
+      {
+        m_OldValue = in;
+        if(++m_Count >= m_Divisor)
+        {
+          m_Count = 0;
+          m_Out = !m_Out;
+        }
+    }
+    return m_Out;
   }
   void onTick(void) { m_Tick++; }
-  void setDivider(uint8_t divider) { m_Divider = divider; }
+  void setDivisor(uint8_t divisor) { m_Divisor = divisor; }
   void setFactor(uint8_t factor) { m_Factor = factor; }
+
 private:
   uint8_t m_Tick;
-  uint8_t m_Divider;
+  uint8_t m_Divisor;
   uint8_t m_Factor;
+  bool m_OldValue;
+  bool m_Out;
+  uint8_t m_Count;
 };
 
 

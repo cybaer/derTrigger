@@ -1,7 +1,7 @@
 /*
- * clock.h
+ * analogSwitch.h
  *
- *  Created on: 03.03.2017
+ *  Created on: 18.03.2017
  *      Author: cybaer
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,27 +17,35 @@
  *
  */
 
-#ifndef CLOCK_H_
-#define CLOCK_H_
+#ifndef ANALOGSWITCH_H_
+#define ANALOGSWITCH_H_
 
-template <typename ClockOut>
-class Clock
+#include "avrlib/adc.h"
+#include <stdint.h>
+
+template<uint8_t Count>
+class Mapper
 {
 public:
-  Clock(void)
-  : m_OldValue(0)
-  {}
-  // always wanted to use a functor :-)
-  bool operator()(uint8_t in)
-  {
-    ClockOut::set_value(in);
-    bool ret = (in == 0 && m_OldValue != 0);
-    m_OldValue = in;
-    return ret;
-  }
 
-private:
-  uint8_t m_OldValue;
+  static uint8_t get(uint8_t in)
+  {
+    return (in & 0xFE) / Section;
+  }
+  static const uint8_t Section = (0xFF / Count) +1;
 };
 
-#endif /* CLOCK_H_ */
+template <class Adc, uint8_t Port, uint8_t Count>
+class AnalogSwitch
+{
+public:
+  typedef Mapper<Count> Map;
+  static uint8_t getValue(void)
+  {
+    return Map::get(Adc::Read(Port) >> 2);
+  }
+};
+
+
+
+#endif /* ANALOGSWITCH_H_ */
