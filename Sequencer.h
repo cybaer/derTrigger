@@ -24,6 +24,7 @@
 #include "Pulse.h"
 #include "clock.h"
 #include "divider.h"
+#include "stepper.h"
 
 using namespace avrlib;
 
@@ -53,7 +54,7 @@ private:
   uint8_t m_Tick;
   bool m_Run;
   bool m_ClockValue;
-  uint8_t m_Step;
+  Stepper m_Stepper;
   Pulse<Output_A> m_Pulse_A;
   Pulse<Output_B> m_Pulse_B;
 };

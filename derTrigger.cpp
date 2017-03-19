@@ -53,9 +53,6 @@ void setup()
 }
 
 void loop() {
-  //sequencer.onStep();
-  //delay(500);
-
   if(poll)
   {
     poll = false;

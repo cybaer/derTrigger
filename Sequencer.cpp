@@ -33,7 +33,7 @@ Sequencer::Sequencer(void)
 , m_Tick(0)
 , m_Run(false)
 , m_ClockValue(true)
-, m_Step(0)
+, m_Stepper()
 , m_Pulse_A()
 , m_Pulse_B()
 {
@@ -49,10 +49,8 @@ void Sequencer::onStep(void)
 }
 void Sequencer::createNextStep(void)
 {
-  static const uint8_t MaxSteps = 16;
-  if(++m_Step == MaxSteps) m_Step = 0;
-
-  uint16_t x = 0x1 << m_Step;
+  uint8_t step = m_Stepper.getNextStep();
+  uint16_t x = 0x1 << step;
   Extender.writeGPIOB(x & 0xFF);
   Extender.writeGPIOA(x >> 8);
 }
@@ -90,13 +88,14 @@ void Sequencer::poll(void)
   if(StartButton::raised()) onStartStop();
   if(ResetButton::raised()) onReset();
 
+  // could be called often then 1ms --> update(), called every loop
   m_ClockValue = ClockIn::value();
-
   if(clock(divider(m_ClockValue)))
   {
     onStep();
   }
 
+  // check the switches for divider,mode, ...
   uint16_t val;
   val = S3::getValue();
   val = S4::getValue();
@@ -105,7 +104,8 @@ void Sequencer::poll(void)
   uint8_t divisor = S1::getValue() + 1;
   divider.setDivisor(divisor);
 
-  uint8_t mode = S1::getValue();
+  E_StepModes mode = static_cast<E_StepModes>(S2::getValue());
+  m_Stepper.setStepMode(mode);
 
   debug::Low();
 }

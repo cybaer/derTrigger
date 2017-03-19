@@ -46,6 +46,4 @@ public:
   }
 };
 
-
-
 #endif /* ANALOGSWITCH_H_ */
