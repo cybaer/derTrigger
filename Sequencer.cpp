@@ -43,9 +43,11 @@ Sequencer::Sequencer(void)
 
 void Sequencer::onStep(void)
 {
-  createNextStep();
-  //delay(1);
-  writeOutStep();
+  if(m_Run)
+  {
+    createNextStep();
+    writeOutStep();
+  }
 }
 void Sequencer::createNextStep(void)
 {
@@ -118,7 +120,9 @@ void Sequencer::update()
 
 void Sequencer::onReset(void)
 {
-
+  m_Stepper.reset();
+  Extender.writeGPIOB(0x00);
+  Extender.writeGPIOA(0);
 }
 void Sequencer::checkPulseOut()
 {
