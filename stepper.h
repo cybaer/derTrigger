@@ -51,11 +51,31 @@ private:
       }
       return actualStep;
     }
-    void setForward(void) { m_Backward = false; m_ToggleMode = false; m_StartStep = 0; }
-    void setBackward(void) { m_Backward = true; m_ToggleMode = false; m_StartStep = 0; }
+    void setForward(void)
+    {
+      if(m_Backward)
+        setReverseStep();
+      m_Backward = false;
+      m_ToggleMode = false;
+      m_StartStep = 0;
+    }
+    void setBackward(void)
+    {
+      if(!m_Backward)
+        setReverseStep();
+      m_Backward = true;
+      m_ToggleMode = false;
+      m_StartStep = 0;
+    }
     void setForBackward(void) { m_ToggleMode = true; m_StartStep = 1; }
     void setPingPong(void) { m_ToggleMode = true; m_StartStep = 0; }
   private:
+    void setReverseStep(void)
+    {
+      if(m_Step == 0)
+        m_Step = MaxSteps-1;
+      m_Step = MaxSteps - m_Step;
+    }
     bool m_Backward;
     bool m_ToggleMode;
     uint8_t m_StartStep;
