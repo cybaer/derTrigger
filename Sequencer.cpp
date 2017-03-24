@@ -87,26 +87,19 @@ void Sequencer::poll(void)
   ResetButton::Read();
   checkPulseOut();
 
-  if(StartButton::raised()) onStartStop();
-  if(ResetButton::raised()) onReset();
-
-  // could be called often then 1ms --> update(), called every loop
-  m_ClockValue = ClockIn::value();
-  if(clock(divider(m_ClockValue)))
-  {
-    onStep();
-  }
+  if(StartButton::lowered()) onStartStop();
+  if(ResetButton::lowered()) onReset();
 
   // check the switches for divider,mode, ...
   uint16_t val;
-  val = S3::getValue();
-  val = S4::getValue();
-  val = S5::getValue();
+  val = SwitchLink::getValue();
+  val = SwitchAction_A::getValue();
+  val = SwitchAction_B::getValue();
 
-  uint8_t divisor = S1::getValue() + 1;
+  uint8_t divisor = SwitchDivider::getValue() + 1;
   divider.setDivisor(divisor);
 
-  E_StepModes mode = static_cast<E_StepModes>(S2::getValue());
+  E_StepModes mode = static_cast<E_StepModes>(SwitchMode::getValue());
   m_Stepper.setStepMode(mode);
 
   debug::Low();
@@ -114,6 +107,12 @@ void Sequencer::poll(void)
 
 void Sequencer::update()
 {
+  //StartIn::
+  m_ClockValue = ClockIn::value();
+  if(clock(divider(m_ClockValue)))
+  {
+    onStep();
+  }
   m_Pulse_A.checkReset(m_Tick);
   m_Pulse_B.checkReset(m_Tick);
 }

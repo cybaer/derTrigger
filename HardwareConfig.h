@@ -54,11 +54,11 @@ typedef Gpio<PortD, 5> ClockOut;  // 5
 
 //typedef I2cMaster<8, 4, 100000> I2C_bus;
 
-typedef AnalogSwitch<Adc, 2, 8> S1;
-typedef AnalogSwitch<Adc, 3, 8> S2;
-typedef AnalogSwitch<Adc, 1, 3> S3;
-typedef AnalogSwitch<Adc, 7, 3> S4;
-typedef AnalogSwitch<Adc, 0, 3> S5;
+typedef AnalogSwitch<Adc, 2, 8> SwitchDivider;
+typedef AnalogSwitch<Adc, 3, 8> SwitchMode;
+typedef AnalogSwitch<Adc, 1, 3> SwitchLink;
+typedef AnalogSwitch<Adc, 7, 3> SwitchAction_A;
+typedef AnalogSwitch<Adc, 0, 3> SwitchAction_B;
 
  extern MCP23017 Extender;
  extern Adc adc;
