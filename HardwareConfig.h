@@ -34,9 +34,29 @@
 using namespace avrlib;
 
 
+template<typename Input, uint8_t ActiveLevel=0>
+class EdgeTrigger
+{
+public:
+  static inline void init(void)
+  {
+    Input::set_mode(DIGITAL_INPUT);
+    if(ActiveLevel == 0) Input::High();
+  }
+  static inline bool isTriggered(void)
+  {
+    uint8_t in = Input::Value();
+    bool ret = in != OldValue && in == ActiveLevel;
+    OldValue = in;
+    return ret;
+  }
+private:
+  static uint8_t OldValue;
+};
+
 typedef Gpio<PortD, 2> ClockIn;  // 2
-typedef Gpio<PortD, 3> StartIn;  // 3
-typedef Gpio<PortD, 4> ResetIn;  // 4
+typedef EdgeTrigger<Gpio<PortD, 3>, 0> StartIn;  // 3
+typedef EdgeTrigger<Gpio<PortD, 4>, 0> ResetIn;  // 4
 typedef Gpio<PortB, 2> Input_A;  // 10
 typedef Gpio<PortB, 3> Input_B;  // 11
 
@@ -67,10 +87,8 @@ inline void initInputs(void)
 {
   ClockIn::set_mode(DIGITAL_INPUT);
   ClockIn::High();
-  StartIn::set_mode(DIGITAL_INPUT);
-  StartIn::High();
-  ResetIn::set_mode(DIGITAL_INPUT);
-  ResetIn::High();
+  StartIn::init();
+  ResetIn::init();
   Input_A::set_mode(DIGITAL_INPUT);
   Input_A::Low();
   Input_B::set_mode(DIGITAL_INPUT);
