@@ -36,6 +36,8 @@ Sequencer::Sequencer(void)
 , m_Stepper()
 , m_Pulse_A()
 , m_Pulse_B()
+, m_Action_A(1)
+, m_Action_B(1)
 {
   m_Pulse_A.setLength(8);
   m_Pulse_B.setLength(8);
@@ -65,12 +67,23 @@ void Sequencer::writeOutStep(void)
 
 void Sequencer::nextStep_A(uint8_t in)
 {
-  if(in)
+  switch(m_Action_A)
   {
-    m_Pulse_A.set(m_Tick);
+    case 0:
+      break;
+    case 1:
+    {
+      if(in)
+      {
+        m_Pulse_A.set(m_Tick);
+      }
+      break;
+    }
+    case 2:
+      break;
   }
-
 }
+
 void Sequencer::nextStep_B(uint8_t in)
 {
   if(in)
@@ -93,7 +106,7 @@ void Sequencer::poll(void)
   // check the switches for divider,mode, ...
   uint16_t val;
   val = SwitchLink::getValue();
-  val = SwitchAction_A::getValue();
+  m_Action_A = SwitchAction_A::getValue();
   val = SwitchAction_B::getValue();
 
   uint8_t divisor = SwitchDivider::getValue() + 1;
@@ -107,7 +120,9 @@ void Sequencer::poll(void)
 
 void Sequencer::update()
 {
-  //StartIn::
+  if(StartIn::isTriggered()) onStartStop();
+  if(ResetIn::isTriggered()) onReset();
+
   m_ClockValue = ClockIn::value();
   if(clock(divider(m_ClockValue)))
   {

@@ -45,7 +45,7 @@ public:
   }
   static inline bool isTriggered(void)
   {
-    uint8_t in = Input::Value();
+    uint8_t in = Input::value();
     bool ret = in != OldValue && in == ActiveLevel;
     OldValue = in;
     return ret;
@@ -54,11 +54,14 @@ private:
   static uint8_t OldValue;
 };
 
+template<typename Input, uint8_t ActiveLevel>
+uint8_t EdgeTrigger<Input, ActiveLevel>::OldValue;
+
 typedef Gpio<PortD, 2> ClockIn;  // 2
 typedef EdgeTrigger<Gpio<PortD, 3>, 0> StartIn;  // 3
 typedef EdgeTrigger<Gpio<PortD, 4>, 0> ResetIn;  // 4
-typedef Gpio<PortB, 2> Input_A;  // 10
-typedef Gpio<PortB, 3> Input_B;  // 11
+typedef Gpio<PortB, 3> Input_A;  // 11
+typedef Gpio<PortB, 2> Input_B;  // 10
 
 typedef Gpio<PortB, 5> debug;  // 13
 
@@ -68,15 +71,15 @@ typedef Gpio<PortB, 1> Reset_;  // 9
 typedef DebouncedSwitch< Start_> StartButton;
 typedef DebouncedSwitch< Reset_> ResetButton;
 
-typedef Gpio<PortD, 7> Output_A;  // 7
-typedef Gpio<PortD, 6> Output_B;  // 6
+typedef Gpio<PortD, 6> Output_A;  // 6
+typedef Gpio<PortD, 7> Output_B;  // 7
 typedef Gpio<PortD, 5> ClockOut;  // 5
 
 //typedef I2cMaster<8, 4, 100000> I2C_bus;
 
 typedef AnalogSwitch<Adc, 2, 8> SwitchDivider;
 typedef AnalogSwitch<Adc, 3, 8> SwitchMode;
-typedef AnalogSwitch<Adc, 1, 3> SwitchLink;
+typedef AnalogSwitch<Adc, 1, 3> SwitchLink;     // 1x16; 2x8; ...
 typedef AnalogSwitch<Adc, 7, 3> SwitchAction_A;
 typedef AnalogSwitch<Adc, 0, 3> SwitchAction_B;
 

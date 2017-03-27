@@ -57,6 +57,8 @@ private:
   Stepper m_Stepper;
   Pulse<Output_A> m_Pulse_A;
   Pulse<Output_B> m_Pulse_B;
+  uint8_t m_Action_A;
+  uint8_t m_Action_B;
 };
 
 extern Sequencer sequencer;
