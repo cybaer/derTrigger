@@ -30,6 +30,7 @@ Adc adc;
 Sequencer::Sequencer(void)
 : divider()
 , clock()
+, m_Tick(0)
 , m_Run(false)
 , m_ClockValue(true)
 , m_Stepper()
@@ -78,7 +79,6 @@ void Sequencer::poll(void)
 
   StartButton::Read();
   ResetButton::Read();
-  checkPulseOut();
 
   if(StartButton::lowered()) onStartStop();
   if(ResetButton::lowered()) onReset();
@@ -87,7 +87,7 @@ void Sequencer::poll(void)
   uint16_t val;
   val = SwitchLink::getValue();
   m_Action_A.setMode(SwitchAction_A::getValue());
-  val = SwitchAction_B::getValue();
+  m_Action_B.setMode(SwitchAction_B::getValue());
 
   uint8_t divisor = SwitchDivider::getValue() + 1;
   divider.setDivisor(divisor);
@@ -117,9 +117,5 @@ void Sequencer::onReset(void)
   m_Stepper.reset();
   Extender.writeGPIOB(0x00);
   Extender.writeGPIOA(0);
-}
-void Sequencer::checkPulseOut()
-{
-
 }
 

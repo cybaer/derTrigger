@@ -36,25 +36,16 @@ public:
   void onStep(void);
   void poll(void);
   void update(void);
-
   void onStartStop(void) { m_Run = !m_Run; };
   void onReset(void);
   void setPulse_A(void) { m_Pulse_A.set(m_Tick); };
   void setPulse_B(void) { m_Pulse_B.set(m_Tick); };
 
 private:
-  void checkPulseOut(void);
   void createNextStep(void);
-
   void writeOutStep(void);
-
   void nextStep_A(uint8_t in);
   void nextStep_B(uint8_t in);
-
-
-
-
-
 
   Divider divider;
   Clock<ClockOut> clock;
@@ -64,8 +55,6 @@ private:
   Stepper m_Stepper;
   Pulse<Output_A> m_Pulse_A;
   Pulse<Output_B> m_Pulse_B;
-  //uint8_t m_Action_A;
- // uint8_t m_Action_B;
 
   typedef void (Sequencer::*P2MF)(void);
 
@@ -80,27 +69,28 @@ private:
     void setMode(uint8_t mode) { m_Mode = mode; }
     void action(uint8_t in)
     {
-      switch(m_Mode)
+      if(in)
+      {
+        switch(m_Mode)
         {
-          case 0:
-            break;
-          case 1:
-          {
-            if(in)
-            {
-              (m_Parent.*setPulse)(); // call of P2MF
-            }
-            break;
-          }
-          case 2:
-            break;
+        case 0:
+          m_Parent.onReset();
+          break;
+        case 1:
+          (m_Parent.*setPulse)(); // call of P2MF
+          break;
+        case 2:
+          m_Parent.onStartStop();
+          break;
         }
+      }
     }
   private:
     Sequencer& m_Parent;
     P2MF setPulse;
     uint8_t m_Mode;
   };
+
   friend class StepAction;
   StepAction m_Action_A;
   StepAction m_Action_B;
