@@ -22,7 +22,7 @@
 
 #include "inttypes.h"
 
-enum E_StepModes {Forward, Backward, ForBackward, PingPong, Crawl, Cxxx, Brownian, Random};
+enum E_StepModes {Forward, Backward, ForBackward, PingPong, Crawl, Crab, Brownian, Random};
 static const uint8_t MaxSteps = 16;
 
 //template<uint8_t MaxSteps = 16>
@@ -92,8 +92,38 @@ private:
     bool m_ToggleMode;
     uint8_t m_StartStep;
   };
+
+
+
+  template<uint8_t Pattern, uint8_t PatternLen, int8_t vatue_0, int8_t value_1>
+  class NonLinearGenerator : public StepGenerator
+  {
+  public:
+    NonLinearGenerator(void) : m_BitCounter(0) {};
+    virtual void reset(void)
+    {
+      m_BitCounter = 0;
+      StepGenerator::reset();
+    }
+    virtual uint8_t get(void)
+    {
+      const uint8_t actualStep = m_Step;
+      if(++m_BitCounter > PatternLen) m_BitCounter = 0;
+      const uint8_t bitMask = 0x01 << m_BitCounter;
+      const bool bitActive = (Pattern & bitMask) != 0;
+      const int8_t delta = bitActive ? value_1 : vatue_0;
+      const int8_t testStep = m_Step + delta;
+      m_Step = testStep < 0         ? MaxSteps - testStep :
+               testStep >= MaxSteps ? testStep - MaxSteps :
+                                      testStep;
+      return actualStep;
+    }
+  private:
+    uint8_t m_BitCounter;
+  };
   StepGenerator* m_StepGenerator;
   LinearGenerator m_LinearStepper;
+  NonLinearGenerator<0x03, 2, -1, 1> m_CrawlStepper;
 };
 
 

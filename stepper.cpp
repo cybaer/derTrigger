@@ -47,9 +47,10 @@ void Stepper::setStepMode(E_StepModes mode)
     }
     case Crawl:
     {
+      m_StepGenerator = &m_CrawlStepper;
       break;
     }
-    case Cxxx:
+    case Crab:
     {
       break;
     }
