@@ -43,8 +43,6 @@ ISR(TIMER2_OVF_vect, ISR_NOBLOCK)
 void setup()
 {
   initHW();
-
-
   //     16MHz / (8 * 510) = 3906,25 Hz
   // prescaler(2)_|
   Timer<2>::set_prescaler(2);//2

@@ -35,9 +35,13 @@ public:
   }
   void checkReset(uint8_t tick)
   {
-    if(m_EndTick-tick <= 0)
+    if(Output::is_high())
     {
-      Output::Low();
+      if(static_cast<int8_t>(m_EndTick - tick) <= 0)  // cast is very import.--> compiler extends to 16 bit integer (integral promotion)
+      {
+        debug::Toggle();
+        Output::Low();
+      }
     }
   }
   bool isActive(void) const { return Output::is_high(); }

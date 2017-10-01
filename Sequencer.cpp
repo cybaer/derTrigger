@@ -25,8 +25,6 @@
 Sequencer sequencer;
 Adc adc;
 
-
-
 Sequencer::Sequencer(void)
 : divider()
 , clock()
@@ -46,6 +44,7 @@ void Sequencer::onStep(void)
   if(m_Run)
   {
     createNextStep();
+    //delayMicroseconds(500);
     writeOutStep();
   }
 }
@@ -75,17 +74,16 @@ void Sequencer::nextStep_B(uint8_t in)
 
 void Sequencer::poll(void)
 {
-  debug::High();
-
   StartButton::Read();
   ResetButton::Read();
 
   if(StartButton::lowered()) onStartStop();
   if(ResetButton::lowered()) onReset();
 
-  // check the switches for divider,mode, ...
+// check the switches for divider,mode, ...
   uint16_t val;
   val = SwitchLink::getValue();
+
   m_Action_A.setMode(SwitchAction_A::getValue());
   m_Action_B.setMode(SwitchAction_B::getValue());
 
@@ -94,8 +92,6 @@ void Sequencer::poll(void)
 
   E_StepModes mode = static_cast<E_StepModes>(SwitchMode::getValue());
   m_Stepper.setStepMode(mode);
-
-  debug::Low();
 }
 
 void Sequencer::update()
@@ -106,6 +102,7 @@ void Sequencer::update()
   m_ClockValue = ClockIn::value();
   if(clock(divider(m_ClockValue)))
   {
+    debug::Toggle();
     onStep();
   }
   m_Pulse_A.checkReset(m_Tick);

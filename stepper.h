@@ -113,7 +113,7 @@ private:
       const bool bitActive = (Pattern & bitMask) != 0;
       const int8_t delta = bitActive ? value_1 : vatue_0;
       const int8_t testStep = m_Step + delta;
-      m_Step = testStep < 0         ? MaxSteps - testStep :
+      m_Step = testStep < 0         ? MaxSteps -1 - testStep :
                testStep >= MaxSteps ? testStep - MaxSteps :
                                       testStep;
       return actualStep;

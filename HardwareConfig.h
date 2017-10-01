@@ -71,9 +71,9 @@ typedef Gpio<PortB, 1> Reset_;  // 9
 typedef DebouncedSwitch< Start_> StartButton;
 typedef DebouncedSwitch< Reset_> ResetButton;
 
-typedef Gpio<PortD, 6> Output_A;  // 6
-typedef Gpio<PortD, 7> Output_B;  // 7
-typedef Gpio<PortD, 5> ClockOut;  // 5
+typedef Inverter<Gpio<PortD, 6> > Output_A;  // 6
+typedef Inverter<Gpio<PortD, 7> > Output_B;  // 7
+typedef Inverter<Gpio<PortD, 5> > ClockOut;  // 5
 
 //typedef I2cMaster<8, 4, 100000> I2C_bus;
 
