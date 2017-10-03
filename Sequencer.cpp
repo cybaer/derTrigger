@@ -35,8 +35,8 @@ Sequencer::Sequencer(void)
 , m_Action_A(*this, &Sequencer::setPulse_A)
 , m_Action_B(*this, &Sequencer::setPulse_B)
 {
-  m_Pulse_A.setLength(8);
-  m_Pulse_B.setLength(8);
+  m_Pulse_A.setLength(DefaultPulseLength);
+  m_Pulse_B.setLength(DefaultPulseLength);
 }
 
 void Sequencer::onStep(void)
@@ -102,7 +102,6 @@ void Sequencer::update()
   m_ClockValue = ClockIn::value();
   if(clock(divider(m_ClockValue)))
   {
-    debug::Toggle();
     onStep();
   }
   m_Pulse_A.checkReset(m_Tick);

@@ -93,8 +93,6 @@ private:
     uint8_t m_StartStep;
   };
 
-
-
   template<uint8_t Pattern, uint8_t PatternLen, int8_t vatue_0, int8_t value_1>
   class NonLinearGenerator : public StepGenerator
   {

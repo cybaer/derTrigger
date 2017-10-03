@@ -22,6 +22,8 @@
 
 #include "HardwareConfig.h"
 
+static const uint8_t DefaultPulseLength = 8;
+
 template<typename Output>
 class Pulse
 {
@@ -37,11 +39,8 @@ public:
   {
     if(Output::is_high())
     {
-      if(static_cast<int8_t>(m_EndTick - tick) <= 0)  // cast is very import.--> compiler extends to 16 bit integer (integral promotion)
-      {
-        debug::Toggle();
-        Output::Low();
-      }
+      int8_t tickDiff = m_EndTick - tick;  // prevents integral promotion to 16 bit int
+      if(tickDiff <= 0) Output::Low();
     }
   }
   bool isActive(void) const { return Output::is_high(); }
@@ -54,6 +53,5 @@ template<typename Output>
 uint8_t Pulse<Output>::m_Length;
 template<typename Output>
 uint8_t Pulse<Output>::m_EndTick;
-
 
 #endif /* PULSE_H_ */
