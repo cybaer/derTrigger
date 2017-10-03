@@ -58,6 +58,4 @@ private:
   uint8_t m_Count;
 };
 
-
-
 #endif /* DIVIDER_H_ */
