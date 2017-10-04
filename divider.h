@@ -28,22 +28,30 @@ public:
   , m_Divisor(1)
   , m_Factor(1)
   , m_OldValue(false)
-  , m_Out(false)
+  , m_Action(false)
   , m_Count(0)
   {}
 
   bool operator()(bool in)
   {
-    if(in != m_OldValue)
+    if(in)
+    {
+      if(in != m_OldValue)
       {
         m_OldValue = in;
         if(++m_Count >= m_Divisor)
         {
           m_Count = 0;
-          m_Out = !m_Out;
+          m_Action = true;
         }
+      }
     }
-    return m_Out;
+    else
+    {
+      m_Action = false;
+      m_OldValue = false;
+    }
+    return m_Action;
   }
   void onTick(void) { m_Tick++; }
   void setDivisor(uint8_t divisor) { m_Divisor = divisor; }
@@ -54,7 +62,7 @@ private:
   uint8_t m_Divisor;
   uint8_t m_Factor;
   bool m_OldValue;
-  bool m_Out;
+  bool m_Action;
   uint8_t m_Count;
 };
 

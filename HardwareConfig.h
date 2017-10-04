@@ -57,7 +57,7 @@ private:
 template<typename Input, uint8_t ActiveLevel>
 uint8_t EdgeTrigger<Input, ActiveLevel>::OldValue;
 
-typedef Gpio<PortD, 2> ClockIn;  // 2
+typedef Inverter<Gpio<PortD, 2> > ClockIn;  // 2
 typedef EdgeTrigger<Gpio<PortD, 3>, 0> StartIn;  // 3
 typedef EdgeTrigger<Gpio<PortD, 4>, 0> ResetIn;  // 4
 typedef Gpio<PortB, 3> Input_A;  // 11

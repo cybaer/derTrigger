@@ -31,7 +31,7 @@ public:
   bool operator()(uint8_t in)
   {
     ClockOut::set_value(in);
-    bool raised = (in == 0 && m_OldValue != 0);
+    bool raised = (in != 0 && m_OldValue == 0);
     m_OldValue = in;
     return raised;
   }
