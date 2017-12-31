@@ -32,7 +32,7 @@ class Sequencer
 {
 public:
   Sequencer(void);
-  void onClock(void) { m_Tick++; divider.onTick(); } // called only in ISR context
+  void onClock(void) { m_Tick++; multivider.onTick(); } // called only in ISR context
   void onStep(void);
   void poll(void);
   void update(void);
@@ -46,8 +46,11 @@ private:
   void writeOutStep(void);
   void nextStep_A(uint8_t in);
   void nextStep_B(uint8_t in);
+  uint8_t calcDivisor(uint8_t value);
+  uint8_t calcFactor(uint8_t value);
 
-  Divider divider;
+  Multivider multivider;
+  //Divider divider;
   Clock<ClockOut> clock;
   uint8_t m_Tick;
   bool m_Run;

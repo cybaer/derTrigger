@@ -26,7 +26,7 @@ Sequencer sequencer;
 Adc adc;
 
 Sequencer::Sequencer(void)
-: divider()
+: multivider()
 , clock()
 , m_Tick(0)
 , m_Run(false)
@@ -87,8 +87,9 @@ void Sequencer::poll(void)
   m_Action_A.setMode(SwitchAction_A::getValue());
   m_Action_B.setMode(SwitchAction_B::getValue());
 
-  uint8_t divisor = SwitchDivider::getValue() + 1;
-  divider.setDivisor(divisor);
+  uint8_t multividerValue = SwitchMultivider::getValue();
+  multivider.setDivisor(calcDivisor(multividerValue));
+  multivider.setFactor(calcFactor(multividerValue));
 
   E_StepModes mode = static_cast<E_StepModes>(SwitchMode::getValue());
   m_Stepper.setStepMode(mode);
@@ -100,7 +101,7 @@ void Sequencer::update()
   if(ResetIn::isTriggered()) onReset();
 
   m_ClockValue = ClockIn::value();
-  if(clock(divider(m_ClockValue)))
+  if(clock(multivider(m_ClockValue)))
   {
     onStep();
   }
@@ -113,5 +114,38 @@ void Sequencer::onReset(void)
   m_Stepper.reset();
   Extender.writeGPIOB(0x00);
   Extender.writeGPIOA(0);
+}
+
+uint8_t Sequencer::calcDivisor(uint8_t value)
+{
+  uint8_t divisor = 1;
+  switch(value)
+  {
+  case 3: divisor = 2;
+    break;
+  case 2: divisor = 3;
+    break;
+  case 1: divisor = 4;
+    break;
+  case 0: divisor = 8;
+    break;
+  default: divisor = 1;
+  }
+  return divisor;
+}
+uint8_t Sequencer::calcFactor(uint8_t value)
+{
+  uint8_t factor = 1;
+  switch(value)
+  {
+  case 5: factor = 2;
+    break;
+  case 6: factor = 3;
+    break;
+  case 7: factor = 4;
+    break;
+  default: factor = 1;
+  }
+  return factor;
 }
 

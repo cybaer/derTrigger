@@ -20,13 +20,106 @@
 #ifndef DIVIDER_H_
 #define DIVIDER_H_
 
+class Multiplier
+{
+public:
+  Multiplier(void)
+  : m_Tick(0)
+  , m_RisingTick(0)
+  , m_MulStepTicks(0)
+  , m_OldValue(false)
+  , m_Factor(1)
+  , m_AdditionalPulsesCount(0)
+  , m_NextPulseStartTick(0)
+  , m_PulseEndTick(0)
+  , m_InPulseStart(0)
+  , m_PulseLen(0)
+  , m_Pulse(false)
+  { }
+
+  bool operator() (bool in)
+  {
+    calculatePulseLen(in);
+    if(isRisingEdge(in))
+    {
+      calculateNewPeriod();
+      outStartPulse();
+    }
+    outAdditionalPulse();
+    endPulse();
+    m_OldValue = in;
+    return m_Pulse;
+  }
+  void onTick(void) { m_Tick++; }
+  void setFactor(uint8_t factor) { m_Factor = factor; }
+
+private:
+  inline void calculatePulseLen(bool const in)
+  {
+    if(isRisingEdge(in))
+    {
+      m_InPulseStart = m_Tick;
+    }
+    if(isFallingEdge(in))
+    {
+      m_PulseLen = m_Tick - m_InPulseStart;
+    }
+  }
+  inline void calculateNewPeriod(void)
+  {
+    uint16_t deltaTick = m_Tick - m_RisingTick;
+    m_MulStepTicks = (deltaTick + m_Factor / 2) / m_Factor;
+    m_RisingTick = m_Tick;
+  }
+  inline void outStartPulse(void)
+  {
+    m_AdditionalPulsesCount = m_Factor - 1;
+    newPulse(m_Tick + m_MulStepTicks);
+    m_Pulse = true;
+  }
+  inline void outAdditionalPulse(void)
+  {
+    if(m_AdditionalPulsesCount > 0 && int16_t(m_NextPulseStartTick - m_Tick) <= 0)
+    {
+      m_AdditionalPulsesCount--;
+      newPulse(m_NextPulseStartTick += m_MulStepTicks);
+      m_Pulse = true;
+    }
+  }
+  inline void endPulse(void)
+  {
+    if(m_Pulse && int16_t(m_PulseEndTick - m_Tick) <= 0)
+    {
+      m_Pulse = false;
+    }
+  }
+  inline bool isRisingEdge(bool const in) const { return in && !m_OldValue; };
+  inline bool isFallingEdge(bool const in) const { return !in && m_OldValue; };
+  inline void newPulse(uint16_t startTick)
+  {
+    m_NextPulseStartTick = startTick;
+    m_PulseEndTick = m_Tick + m_PulseLen;
+  }
+  uint16_t m_Tick;
+  uint16_t m_RisingTick;
+  uint16_t m_MulStepTicks;
+  bool m_OldValue;
+  uint8_t m_Factor;
+  uint8_t m_AdditionalPulsesCount;
+  uint16_t m_NextPulseStartTick;
+  uint16_t m_PulseEndTick;
+  uint16_t m_InPulseStart;
+  uint16_t m_PulseLen;
+  bool m_Pulse;
+};
+
+
 class Divider
 {
 public:
   Divider(void)
   : m_Tick(0)
   , m_Divisor(1)
-  , m_Factor(1)
   , m_OldValue(false)
   , m_Action(false)
   , m_Count(0)
@@ -47,7 +140,7 @@ public:
       }
     }
     else
-    {
+    { // reproducing the original pulse length
       m_Action = false;
       m_OldValue = false;
     }
@@ -55,15 +148,29 @@ public:
   }
   void onTick(void) { m_Tick++; }
   void setDivisor(uint8_t divisor) { m_Divisor = divisor; }
-  void setFactor(uint8_t factor) { m_Factor = factor; }
 
 private:
-  uint8_t m_Tick;
+
+  uint16_t m_Tick;
   uint8_t m_Divisor;
-  uint8_t m_Factor;
   bool m_OldValue;
   bool m_Action;
   uint8_t m_Count;
+};
+
+class Multivider
+{
+public:
+  bool operator()(bool in)
+  {
+    return m_Divider(m_Multiplier(in));
+  }
+  void onTick(void) {m_Multiplier.onTick(); m_Divider.onTick(); };
+  void setFactor(uint8_t factor) { m_Multiplier.setFactor(factor); };
+  void setDivisor(uint8_t divisor) { m_Divider.setDivisor(divisor); };
+private:
+  Multiplier m_Multiplier;
+  Divider m_Divider;
 };
 
 #endif /* DIVIDER_H_ */

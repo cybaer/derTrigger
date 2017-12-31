@@ -42,6 +42,8 @@ ISR(TIMER2_OVF_vect, ISR_NOBLOCK)
 
 void setup()
 {
+  Serial.begin(9600);
+  Serial.println("*** START ***");
   initHW();
   //     16MHz / (8 * 510) = 3906,25 Hz
   // prescaler(2)_|
@@ -50,7 +52,8 @@ void setup()
   Timer<2>::Start();
 }
 
-void loop() {
+void loop()
+{
   if(poll)
   {
     poll = false;

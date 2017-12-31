@@ -77,7 +77,7 @@ typedef Inverter<Gpio<PortD, 5> > ClockOut;  // 5
 
 //typedef I2cMaster<8, 4, 100000> I2C_bus;
 
-typedef AnalogSwitch<Adc, 2, 8> SwitchDivider;
+typedef AnalogSwitch<Adc, 2, 8> SwitchMultivider;
 typedef AnalogSwitch<Adc, 3, 8> SwitchMode;
 typedef AnalogSwitch<Adc, 1, 3> SwitchLink;     // 1x16; 2x8; ...
 typedef AnalogSwitch<Adc, 7, 3> SwitchAction_A;
