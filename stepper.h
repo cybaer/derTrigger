@@ -111,7 +111,7 @@ private:
       const bool bitActive = (Pattern & bitMask) != 0;
       const int8_t delta = bitActive ? value_1 : vatue_0;
       const int8_t testStep = m_Step + delta;
-      m_Step = testStep < 0         ? MaxSteps -1 - testStep :
+      m_Step = testStep < 0         ? MaxSteps + testStep :
                testStep >= MaxSteps ? testStep - MaxSteps :
                                       testStep;
       return actualStep;
@@ -121,9 +121,8 @@ private:
   };
   StepGenerator* m_StepGenerator;
   LinearGenerator m_LinearStepper;
-  NonLinearGenerator<0x03, 2, -1, 1> m_CrawlStepper;
+  NonLinearGenerator<0x06, 2, -1, 1> m_CrawlStepper;
+  NonLinearGenerator<0xAA, 7, -3, 4> m_CrabStepper;
 };
-
-
 
 #endif /* STEPPER_H_ */
