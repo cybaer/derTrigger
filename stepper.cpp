@@ -68,10 +68,12 @@ void Stepper::setStepMode(E_StepModes mode)
     }
     case Brownian:
     {
+      m_StepGenerator = &m_BrownianGenerator;
       break;
     }
     case Random:
     {
+      m_StepGenerator = &m_RandomGenerator;
       break;
     }
     default:

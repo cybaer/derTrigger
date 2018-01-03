@@ -20,12 +20,14 @@
 #ifndef STEPPER_H_
 #define STEPPER_H_
 
+#include "Arduino.h"
+#include "avrlib/random.h"
 #include "inttypes.h"
 
 enum E_StepModes {Forward, Backward, ForBackward, PingPong, Crawl, Crab, Brownian, Random};
 static const uint8_t MaxSteps = 16;
 
-//template<uint8_t MaxSteps = 16>
+// poss.: template<uint8_t MaxSteps = 16>
 class Stepper
 {
 public:
@@ -33,16 +35,26 @@ public:
   uint8_t getNextStep(void);
   void setStepMode(E_StepModes mode);
   void reset(void) { m_StepGenerator->reset(); }
+
 private:
   class StepGenerator
   {
   public:
-    StepGenerator(void) : m_Step(0) {}
-    virtual void reset(void) { m_Step = 0; }
+    StepGenerator(void) : m_NextStep(0) {}
+    virtual void reset(void) { m_NextStep = 0; }
     virtual uint8_t get(void) = 0;
   protected:
-    uint8_t m_Step;
+    void setNextStep(int8_t delta)
+    {
+      const int8_t testStep = m_NextStep + delta;
+      // handle the wrap arround
+      m_NextStep = testStep < 0         ? MaxSteps + testStep :
+                   testStep >= MaxSteps ? testStep - MaxSteps :
+                   testStep;
+    }
+    uint8_t m_NextStep;
   };
+
   class LinearGenerator : public StepGenerator
   {
   public:
@@ -54,12 +66,12 @@ private:
     }
     virtual uint8_t get(void)
     {
-      uint8_t actualStep = m_Backward ? MaxSteps - 1 - m_Step : m_Step;
-      if(++m_Step == MaxSteps)
+      uint8_t actualStep = m_Backward ? MaxSteps - 1 - m_NextStep : m_NextStep;
+      if(++m_NextStep == MaxSteps)
       {
         if(m_ToggleMode)
           m_Backward = !m_Backward;
-        m_Step = m_StartStep;
+        m_NextStep = m_StartStep;
       }
       return actualStep;
     }
@@ -84,9 +96,9 @@ private:
   private:
     void setReverseStep(void)
     {
-      if(m_Step == 0)
-        m_Step = MaxSteps-1;
-      m_Step = MaxSteps - m_Step;
+      if(m_NextStep == 0)
+        m_NextStep = MaxSteps-1;
+      m_NextStep = MaxSteps - m_NextStep;
     }
     bool m_Backward;
     bool m_ToggleMode;
@@ -105,24 +117,50 @@ private:
     }
     virtual uint8_t get(void)
     {
-      const uint8_t actualStep = m_Step;
+      const uint8_t actualStep = m_NextStep;
       if(++m_BitCounter > PatternLen) m_BitCounter = 0;
       const uint8_t bitMask = 0x01 << m_BitCounter;
       const bool bitActive = (Pattern & bitMask) != 0;
       const int8_t delta = bitActive ? value_1 : vatue_0;
-      const int8_t testStep = m_Step + delta;
-      m_Step = testStep < 0         ? MaxSteps + testStep :
-               testStep >= MaxSteps ? testStep - MaxSteps :
-                                      testStep;
+      setNextStep(delta);
       return actualStep;
     }
   private:
     uint8_t m_BitCounter;
   };
+
+  class BrownianGenerator : public StepGenerator
+    {
+    public:
+      virtual uint8_t get(void)
+      {
+        uint8_t actualStep = m_NextStep;
+        uint8_t rnd = avrlib::Random::GetByte();
+        int8_t deltaStep = rnd > 127 ?  1 :
+                           rnd <  64 ? -1 :
+                           0;
+        setNextStep(deltaStep);
+        return actualStep;
+      }
+    };
+
+  class RandomGenerator : public StepGenerator
+  {
+  public:
+    virtual uint8_t get(void)
+    {
+      uint8_t actualStep = m_NextStep;
+      m_NextStep = avrlib::Random::GetByte() & 0x0F;
+      return actualStep;
+    }
+  };
+
   StepGenerator* m_StepGenerator;
   LinearGenerator m_LinearStepper;
   NonLinearGenerator<0x06, 2, -1, 1> m_CrawlStepper;
   NonLinearGenerator<0xAA, 7, -3, 4> m_CrabStepper;
+  BrownianGenerator m_BrownianGenerator;
+  RandomGenerator m_RandomGenerator;
 };
 
 #endif /* STEPPER_H_ */
