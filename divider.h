@@ -25,8 +25,8 @@ class Multiplier
 public:
   Multiplier(void)
   : m_Tick(0)
-  , m_RisingTick(0)
-  , m_MulStepTicks(0)
+  , m_LastPeriodeTick(0)
+  , m_PeriodeTicks(0)
   , m_OldValue(false)
   , m_Factor(1)
   , m_AdditionalPulsesCount(0)
@@ -65,16 +65,17 @@ private:
       m_PulseLen = m_Tick - m_InPulseStart;
     }
   }
-  inline void calculateNewPeriod(void)
+  inline void calculateNewPeriod(void) // must be called at the same point of every periode (e.g. rising edge)
   {
-    uint16_t deltaTick = m_Tick - m_RisingTick;
-    m_MulStepTicks = (deltaTick + m_Factor / 2) / m_Factor;
-    m_RisingTick = m_Tick;
+    const uint16_t inputPeriodeTicks = m_Tick - m_LastPeriodeTick;
+    const uint8_t roundingOffset = m_Factor / 2;
+    m_PeriodeTicks = (inputPeriodeTicks + roundingOffset) / m_Factor;
+    m_LastPeriodeTick = m_Tick;
   }
   inline void outStartPulse(void)
   {
     m_AdditionalPulsesCount = m_Factor - 1;
-    newPulse(m_Tick + m_MulStepTicks);
+    newPulse(m_Tick + m_PeriodeTicks);
     m_Pulse = true;
   }
   inline void outAdditionalPulse(void)
@@ -82,7 +83,7 @@ private:
     if(m_AdditionalPulsesCount > 0 && int16_t(m_NextPulseStartTick - m_Tick) <= 0)
     {
       m_AdditionalPulsesCount--;
-      newPulse(m_NextPulseStartTick += m_MulStepTicks);
+      newPulse(m_NextPulseStartTick += m_PeriodeTicks);
       m_Pulse = true;
     }
   }
@@ -101,8 +102,8 @@ private:
     m_PulseEndTick = m_Tick + m_PulseLen;
   }
   uint16_t m_Tick;
-  uint16_t m_RisingTick;
-  uint16_t m_MulStepTicks;
+  uint16_t m_LastPeriodeTick;
+  uint16_t m_PeriodeTicks;
   bool m_OldValue;
   uint8_t m_Factor;
   uint8_t m_AdditionalPulsesCount;
